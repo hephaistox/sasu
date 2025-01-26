@@ -1,0 +1,16 @@
+# System tmp files
+.DS_Store
+
+# Compilation temporary files
+/resources/public/js/compiled/
+/target/
+
+# Dev temporary files
+.nrepl-port
+/node_modules/
+/.shadow-cljs/
+.clj-kondo/.cache/
+.cpcache
+
+# Documentation
+/resources/~$Resume.docx
