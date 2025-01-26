@@ -1,0 +1,23 @@
+{:builds
+ {:app {:asset-path "/js/compiled"
+        :dev {:compiler-options {:closure-defines {day8.re-frame.tracing.trace-enabled? true
+                                                   re-frame.trace.trace-enabled? true}}}
+        :devtools {:after-load sasu.fe/refresh-page
+                   :preloads [day8.re-frame-10x.preload.react-18]
+                   :repl-pprint true}
+        :modules {:app {:init-fn sasu.fe/init}}
+        :output-dir "resources/public/js/compiled"
+        :release {:build-options {:ns-aliases {day8.re-frame.tracing day8.re-frame.tracing-stubs}}}
+        :target :browser}
+  :browser-test {:ns-regexp "-test$"
+                 :runner-ns shadow.test.browser
+                 :target :browser-test
+                 :test-dir "target/browser-test"}
+  :ltest {:autorun true
+          :ns-regexp "-test$"
+          :output-to "target/ltest.js"
+          :target :node-test}}
+ :deps {:aliases [:cljs-deps]}
+ :dev-http {9650 ["target/browser-test"]}
+ :http {:port 9550}
+ :nrepl {:port 7150}}

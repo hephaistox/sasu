@@ -1,0 +1,36 @@
+{:aliases {:antq {:deps {com.github.liquidz/antq {:mvn/version "2.11.1276"}
+                         org.slf4j/slf4j-nop {:mvn/version "2.0.17"}}
+                  :main-opts ["-m" "antq.core"]}
+           :clj-test-runner {:exec-fn cognitect.test-runner.api/test
+                             :extra-deps {com.cognitect/test-runner
+                                          {:git/url "https://github.com/cognitect-labs/test-runner"
+                                           :sha "3f288f1f16d167723ad87cc35b1dfee3c1681e10"}}}
+           :cljs-deps {:extra-deps {binaryage/devtools {:mvn/version "1.0.7"}
+                                    com.github.hephaistox/auto-web
+                                    {:git/sha "1c64c75d1ff53b48f22a7925e95d73632d33eca5"}
+                                    day8.re-frame/re-frame-10x {:mvn/version "1.9.10"}
+                                    day8.re-frame/tracing {:mvn/version "0.6.2"}
+                                    metosin/reitit {:mvn/version "0.7.2"}
+                                    re-frame/re-frame {:mvn/version "1.4.3"}
+                                    thheller/shadow-cljs {:mvn/version "2.28.21"}}
+                       :extra-paths ["src/cljc" "src/cljs" "test/cljc" "test/cljs"]}
+           :prod {:exec-args {:port "8080"}
+                  :exec-fn sasu.server/-main}
+           :test-clj {:extra-paths ["test/clj" "test/cljc"]
+                      :main-opts
+                      ["-m" "cognitect.test-runner" "-r" ".*-test.*" "-d" "test/clj" "test/cljc"]}
+           :uberjar {:exec-args {:class-dir "target/classes"
+                                 :jarname "sasu.jar"
+                                 :major-version "1.0"
+                                 :production-dir "target/production"
+                                 :root-dir "target"}
+                     :exec-fn jar/uber
+                     :extra-deps {io.github.clojure/tools.build
+                                  {:git/sha "65b3c45a72b6862783664c436817ad0610372398"}}
+                     :extra-paths ["env/build"]}}
+ :deps {com.github.hephaistox/auto-core {:git/sha "e9bd003098e875d9db98709d0c9104293b63d852"}
+        com.github.hephaistox/auto-web {:git/sha "1c64c75d1ff53b48f22a7925e95d73632d33eca5"}
+        metosin/reitit {:mvn/version "0.7.2"}
+        re-frame/re-frame {:mvn/version "1.4.3"}
+        ring/ring {:mvn/version "1.13.0"}}
+ :paths ["src/clj" "src/cljc" "resources"]}
