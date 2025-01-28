@@ -1,7 +1,8 @@
 (ns kotws.components.items
   "Various helpers to feed components."
-  (:require [kotws.sub-map :as ksubmap]
-            [clojure.string :as str]))
+  (:require
+   [clojure.string :as str]
+   [kotws.sub-map  :as ksubmap]))
 
 (defn str-to-kw
   "Turns the string `s` into a wellformed keyword (lower case with space replaced with -). `suffix` could be added at the end if given."
@@ -27,10 +28,8 @@
   (ksubmap/array-map-add-key items :name))
 
 (defn default-with-kw
-  ([items target-kw src-kw]
-   (ksubmap/reference-kw-suffix items target-kw src-kw))
-  ([items target-kw src-kw suffix]
-   (ksubmap/reference-kw-suffix items target-kw src-kw suffix)))
+  ([items target-kw src-kw] (ksubmap/reference-kw-suffix items target-kw src-kw))
+  ([items target-kw src-kw suffix] (ksubmap/reference-kw-suffix items target-kw src-kw suffix)))
 
 (defn default-with-kws
   [items defaultings]
@@ -38,12 +37,9 @@
             (if (keyword? defaulting)
               (default-with-kw items defaulting :name)
               (let [[target-kw src-kw suffix] defaulting]
-                (default-with-kw items
-                                 target-kw
-                                 (if (nil? src-kw) :name src-kw)
-                                 suffix))))
-    items
-    defaultings))
+                (default-with-kw items target-kw (if (nil? src-kw) :name src-kw) suffix))))
+          items
+          defaultings))
 
 (defn apply-dic
   "Use `dic` as a dictionnary to translate all values matching keys `kws` in submaps of `items`.
@@ -56,12 +52,10 @@
                               (fn [item]
                                 (let [kw-val (get item kw)]
                                   (cond-> item
-                                    (keyword? kw-val) (assoc kw
-                                                        (if (or (map? dic)
-                                                                (fn? dic))
-                                                          (dic kw-val)
-                                                          kw-val)))))))
-         items)))
+                                    (keyword? kw-val)
+                                    (assoc kw
+                                           (if (or (map? dic) (fn? dic)) (dic kw-val) kw-val)))))))
+               items)))
 
 (defn translate
   "Returns a map of each `lang` associated to the `items` translated with `tr`"

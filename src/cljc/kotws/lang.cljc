@@ -1,9 +1,13 @@
 (ns kotws.lang "Multi language.")
 
 (def languages
-  {:en {:label {:fr "Anglais", :en "English"}, :accept-lang "en"},
-   :fr
-     {:label {:fr "Français", :en "French"}, :accept-lang "fr", :default true}})
+  {:en {:label {:fr "Anglais"
+                :en "English"}
+        :accept-lang "en"}
+   :fr {:label {:fr "Français"
+                :en "French"}
+        :accept-lang "fr"
+        :default true}})
 
 (def possible-langs (set (keys languages)))
 

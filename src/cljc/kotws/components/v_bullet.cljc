@@ -1,7 +1,8 @@
 (ns kotws.components.v-bullet
   "Shows a bullet list."
-  (:require [kotws.components.items :as kcitems]
-            [kotws.links :as klinks]))
+  (:require
+   [kotws.components.items :as kcitems]
+   [kotws.links            :as klinks]))
 
 (defn defaulting
   [items tr href-dic langs]
@@ -24,12 +25,13 @@
       * `desc` the description to continue the label explanation"
   [items]
   (reduce (fn [hiccup
-               {:keys [fa-icon name href label desc],
+               {:keys [fa-icon name href label desc]
                 :or {fa-icon "fa-circle"}}]
             (conj hiccup
                   ^{:key name}
-                  [:li.text [:i.fa.w3-margin-right {:class fa-icon}]
+                  [:li.text
+                   [:i.fa.w3-margin-right {:class fa-icon}]
                    [:b.text.w3-margin-right (klinks/a href (str label ":"))]
                    desc]))
-    [:ul.w3-ul]
-    (vals items)))
+          [:ul.w3-ul]
+          (vals items)))

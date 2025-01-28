@@ -1,14 +1,12 @@
 (ns kotws.fe-language
   "Frontend language."
-  (:require [kotws.subs :as subs]
-            [kotws.local-storage :as klocal-storage]
-            [kotws.events :as events]
-            [re-frame.core :as rf]))
+  (:require
+   [kotws.events        :as events]
+   [kotws.local-storage :as klocal-storage]
+   [kotws.subs          :as subs]
+   [re-frame.core       :as rf]))
 
-(defn current-language
-  "Currently set language in the UI."
-  []
-  @(rf/subscribe [::subs/language]))
+(defn current-language "Currently set language in the UI." [] @(rf/subscribe [::subs/language]))
 
 (defn set-language
   [l]

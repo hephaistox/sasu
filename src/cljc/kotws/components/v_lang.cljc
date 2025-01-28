@@ -1,7 +1,8 @@
 (ns kotws.components.v-lang
   "Language based components"
-  (:require [kotws.components.v-labelled-image :as vclabelled-image]
-            [kotws.components.items :as kcitems]))
+  (:require
+   [kotws.components.items            :as kcitems]
+   [kotws.components.v-labelled-image :as vclabelled-image]))
 
 (defn defaulting
   "Translates `img-link` and `href-link` with `image-dic` and `doc-dic`"

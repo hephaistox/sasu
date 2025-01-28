@@ -1,27 +1,28 @@
 (ns kotws.page-place-holder
-  (:require [kotws.pages.c-home :refer [home]]
-            [kotws.pages.c-about :refer [about]]
-            [kotws.pages.c-biblio :refer [biblio]]
-            [kotws.pages.c-it :refer [it]]
-            [kotws.pages.c-teaching :refer [teaching]]
-            [kotws.pages.c-o-r :refer [o-r]]
-            [kotws.pages :as kpages]
-            [kotws.blogs.c-this-website :refer [this-website]]
-            [kotws.pages.c-sc :refer [sc]]
-            [kotws.pages.c-tech-stack :refer [tech-stack]]
-            [kotws.pages.c-founder :refer [founder]]
-            [clojure.set :as set]))
+  (:require
+   [clojure.set                :as set]
+   [kotws.blogs.c-this-website :refer [this-website]]
+   [kotws.pages                :as kpages]
+   [kotws.pages.c-about        :refer [about]]
+   [kotws.pages.c-biblio       :refer [biblio]]
+   [kotws.pages.c-founder      :refer [founder]]
+   [kotws.pages.c-home         :refer [home]]
+   [kotws.pages.c-it           :refer [it]]
+   [kotws.pages.c-o-r          :refer [o-r]]
+   [kotws.pages.c-sc           :refer [sc]]
+   [kotws.pages.c-teaching     :refer [teaching]]
+   [kotws.pages.c-tech-stack   :refer [tech-stack]]))
 
 (def kw->panel
-  {:about [about],
-   :biblio [biblio],
-   :it [it],
-   :founder [founder],
-   :home [home],
-   :or [o-r],
-   :sc [sc],
-   :this-website [this-website],
-   :teaching [teaching],
+  {:about [about]
+   :biblio [biblio]
+   :it [it]
+   :founder [founder]
+   :home [home]
+   :or [o-r]
+   :sc [sc]
+   :this-website [this-website]
+   :teaching [teaching]
    :tech-stack [tech-stack]})
 
 (defn check-route
@@ -37,9 +38,7 @@
           (js/console.log "Page without route" (pr-str page-wo-route)))
         (when-not (empty? route-wo-page)
           (js/console.log "Route without page" (pr-str route-wo-page)))
-        (js/console.log "Well defined:"
-                        (pr-str (set/intersection defined-pages
-                                                  defined-routes)))
+        (js/console.log "Well defined:" (pr-str (set/intersection defined-pages defined-routes)))
         true))))
 
 ;; To log errors before the beginning of the page loading

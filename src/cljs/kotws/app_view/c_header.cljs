@@ -1,7 +1,8 @@
 (ns kotws.app-view.c-header
   "Header of all pages."
-  (:require [kotws.fe-language :as kfe-lang]
-            [kotws.app-view.v-header :as kheader]))
+  (:require
+   [kotws.app-view.v-header :as kheader]
+   [kotws.fe-language       :as kfe-lang]))
 
 (defn c-header
   "Component displaying the header."

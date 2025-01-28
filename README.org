@@ -1,0 +1,12 @@
+# caumond-resume
+
+[[https://github.com/hephaistox/sasu/actions/workflows/commit_validation.yml][https://github.com/hephaistox/sasu/actions/workflows/commit_validation.yml/badge.svg]] [[https://github.com/hephaistox/sasu/actions/workflows/pages/pages-build-deployment][https://github.com/hephaistox/sasu/actions/workflows/pages/pages-build-deployment/badge.svg]]
+
+[[https://github.com/hephaistox/hephaistox/wiki][https://img.shields.io/badge/wiki-hephaistox-blue.svg]] [[https://github.com/hephaistox/sasu/wiki][https://img.shields.io/badge/wiki-project-blue.svg]] [[https://github.com/hephaistox/sasu/discussions][https://img.shields.io/badge/discussions-blue.svg]]
+[[https://hephaistox.github.io/sasu/][https://img.shields.io/badge/api-blue.svg]]
+
+A [re-frame](https://github.com/day8/re-frame) application designed to share my resume.
+
+## Goal
+
+This website embeds my resume to promote sasu caumond's work.

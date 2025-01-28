@@ -7,8 +7,8 @@
             (conj hiccup
                   [:button.w3-button.w3-right
                    (cond-> {}
-                     (= current-lang lang) (assoc :class
-                                             "secondary-bg secondary-text")
-                     switch-lang (assoc :on-click #(switch-lang lang))) lang]))
-    [:<>]
-    langs))
+                     (= current-lang lang) (assoc :class "secondary-bg secondary-text")
+                     switch-lang (assoc :on-click #(switch-lang lang)))
+                   lang]))
+          [:<>]
+          langs))

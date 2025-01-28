@@ -1,6 +1,7 @@
 (ns kotws.pages.c-it
   "Developper panel."
-  (:require [kotws.pages.v-it :as kit]
-            [kotws.fe-language :as kfe-lang]))
+  (:require
+   [kotws.fe-language :as kfe-lang]
+   [kotws.pages.v-it  :as kit]))
 
 (defn it [] (kit/v-it (kfe-lang/current-language)))

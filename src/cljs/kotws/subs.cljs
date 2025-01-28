@@ -1,6 +1,7 @@
 (ns kotws.subs
   "Global applications subscriptions."
-  (:require [re-frame.core :as re-frame]))
+  (:require
+   [re-frame.core :as re-frame]))
 
 (re-frame/reg-sub ::name (fn [db] (:name db)))
 

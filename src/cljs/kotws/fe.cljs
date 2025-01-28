@@ -1,10 +1,11 @@
 (ns kotws.fe
-  (:require [reagent.dom :as rdom]
-            [re-frame.core :as rf]
-            [kotws.events :as events]
-            [kotws.routes :as routes]
-            [kotws.app-view :refer [c-panel-el]]
-            [kotws.config :as config]))
+  (:require
+   [kotws.app-view :refer [c-panel-el]]
+   [kotws.config   :as config]
+   [kotws.events   :as events]
+   [kotws.routes   :as routes]
+   [re-frame.core  :as rf]
+   [reagent.dom    :as rdom]))
 
 (defn- dev-warning
   "Warn in console if the dev mode setup?"

@@ -1,10 +1,11 @@
 (ns kotws.routes
   "Frontend routing"
-  (:require [reitit.frontend :as rfe]
-            [kotws.events :as ke]
-            [re-frame.core :as rf]
-            [kotws.pages :as kpages]
-            [reitit.frontend.easy :as rfe-ez]))
+  (:require
+   [kotws.events         :as ke]
+   [kotws.pages          :as kpages]
+   [re-frame.core        :as rf]
+   [reitit.frontend      :as rfe]
+   [reitit.frontend.easy :as rfe-ez]))
 
 (defn on-navigate
   "Called when the uri is modified by browser integeration."

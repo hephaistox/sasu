@@ -1,84 +1,142 @@
-{:paths ["src/cljc"],
+{:deps {io.github.hephaistox/auto-build {:git/sha "e907e29f65049a805c5a33e2f60bbe838c268a1a"}}
+ :paths ["src/cljc"]
  :tasks
-   {-env-dev {:depends [repl-clj repl-cljs]},
-    :init (def dir "target/production"),
-    build-uberjar {:depends [clean],
-                   :doc "Build an uberjar",
-                   :task (do (println "Build production uberjar")
-                             (shell "npx shadow-cljs release app")
-                             (shell "clj -T:uberjar")
-                             (shell "git init -b master" {:dir dir})
-                             (shell (str "git remote add clever "
-                                         (System/getenv
-                                           "SASU_CAUMOND_PROD_REPO"))
-                                    {:dir dir})
-                             (shell "git add ." {:dir dir})
-                             (shell "git commit -m \"auto\"" {:dir dir}))},
-    clean {:doc "Remove temporary build files",
-           :task (do (println "Temporary build files in progress")
-                     (shell "rm -fr target")
-                     (shell "rm -f .DS_Store")
-                     (shell "rm -fr resources/public/js/compiled"))},
-    deploy {:depends [build-uberjar],
-            :doc "Build and deploy",
-            :task (shell "git push --force -u clever master" {:dir dir})},
-    deps {:doc "Update deps",
-          :task (do (shell "clj -M:antq") (shell "npm upgrade"))},
-    doctor
-      {:doc "Doctor checks the project pre requisites",
-       :requires ([babashka.http-client :as http]
-                  [clojure.string :as str]
-                  [kotws.links :as klinks]),
-       :task
-         (do
-           (println "Testing:")
-           (let [r (->> klinks/all-links
-                        (pmap
-                          (fn [{:keys [absolute-url name], :as tested-url}]
-                            (let [s (pr-str name)]
-                              (try (let [content (http/get absolute-url)
-                                         valid? (contains? #{301 200}
-                                                           (:status content))]
-                                     (if valid?
-                                       (print (str s ", "))
-                                       (print (str
-                                                "\u001b[41m"
-                                                s
-                                                "\u001b[0m"
-                                                ", found= "
-                                                (subs (:status content) 1 10))))
-                                     (merge tested-url
-                                            (dissoc content :uri)
-                                            {:valid? valid?}))
-                                   (catch Exception e
-                                     (println (str "\u001b[41m" s "\u001b[0m")
-                                              " -> exception")
-                                     (assoc tested-url
-                                       :exception e
-                                       :url absolute-url))))))
-                        vec)]
-             (println)
-             (println
-               "********************************************************************************")
-             (println "As a synthesis, failed to load :")
-             (doseq [link r]
-               (when-not (:valid? link)
-                 (println "* "
-                          (:absolute-url link)
-                          ", found "
-                          (:status link)
-                          (keys link))))
-             (if (nil? (System/getenv "SASU_CAUMOND_PROD_REPO"))
-               (println
-                 "Setup this environment variable SASU_CAUMOND_PROD_REPO to be able to push to production")
-               (println "Ready to push to production"))))},
-    env-dev {:depends [clean],
-             :doc "Prepare dev environment (both repls and css).",
-             :task (run '-env-dev {:parallel true})},
-    env-prod
-      {:depends [clean],
-       :doc "Compile frontend and backend in production mode and start it",
-       :task (do (shell "npx shadow-cljs release app") (shell "clj -X:prod"))},
-    repl-clj {:doc "Start REPL", :task (shell "clj -X:repl")},
-    repl-cljs {:doc "Starts cljs REPL",
-               :task (shell "npx shadow-cljs watch app")}}}
+ {-env-dev {:depends [repl cljs-browser-test]}
+  :init
+  (do
+    (def ^:dynamic exit System/exit)
+    (def pars
+      {:cljs-app "app"
+       :target-dir "target/production"
+       :deployment-url
+       "git+ssh://git@push-n3-par-clevercloud-customers.services.clever-cloud.com/app_de90b017-993e-4788-8d7f-1cdd0496dc10.git"}))
+  :requires [;;NOTE Should be as small as possible to ensure `lconnect`
+             ;;can start whatever the state of the code is.
+             [auto-build.os.exit-codes]]
+  bp {:doc "Before push"
+      :task (binding [exit (fn [exit-code & _] (when-not (zero? exit-code) exit-code))]
+              (-> (or (run 'format)
+                      (run 'lint)
+                      (binding [*command-line-args* (conj *command-line-args* "all")]
+                        (run 'clj-test))
+                      auto-build.os.exit-codes/ok)
+                  System/exit))}
+  clean {:doc "Remove temporary build files"
+         :requires [[auto-build.tasks.clean :as task-clean]
+                    [auto-build.echo :refer [level1-header]]]
+         :task (-> (task-clean/clean level1-header
+                                     "."
+                                     [".DS_Store"]
+                                     ["resources/public/js/compiled"
+                                      (:target-dir pars)
+                                      "target"
+                                      ".cpcache"
+                                      ".shadow-cljs"
+                                      "node_modules"]
+                                     (current-task))
+                   exit)}
+  clj-test {:doc "Test with clj"
+            :requires [[auto-build.tasks.clj-test :as build-clj-test]
+                       [auto-build.echo :refer [level1-header]]]
+            :task (some->>
+                    ["test-clj"]
+                    (build-clj-test/clj-test level1-header "." "clj-test-runner" (current-task))
+                    exit)}
+  cljs-browser-test
+  {:doc "Test with cljs in browser"
+   :requires [[auto-build.tasks.cljs-browser-test :as build-cljs-browser]
+              [auto-build.echo :refer [level1-header]]]
+   :task (->
+           (build-cljs-browser/cljs-browser-test level1-header "." (current-task) ["browser-test"])
+           exit)}
+  cljs-node-test
+  {:doc "Test with cljs"
+   :requires [[auto-build.tasks.cljs-node-test :as build-cljs-node-test]
+              [auto-build.echo :refer [level1-header]]]
+   :task (-> (build-cljs-node-test/cljs-node-test level1-header "." (current-task) ["ltest"])
+             exit)}
+  deploy {:doc "Build and deploy"
+          :requires [[auto-build.tasks.frontend :as build-frontend]
+                     [auto-build.echo :refer [level1-header]]]
+          :task (-> (build-frontend/deploy level1-header
+                                           "."
+                                           (:target-dir pars)
+                                           (:cljs-app pars)
+                                           (:deployment-url pars))
+                    exit)}
+  deps {:doc "Update deps"
+        :task (do (shell "clj -M:antq") (shell "npm upgrade"))}
+  docs {:doc "Publish documentation of current commit"
+        :requires [[auto-build.tasks.docs :as build-docs] [auto-build.echo :refer [level1-header]]]
+        :task (-> (build-docs/docs level1-header "." (current-task) "gh-pages")
+                  exit)}
+  doctor
+  {:doc "TODO Doctor checks the project pre requisites"
+   :requires ([babashka.http-client :as http] [clojure.string :as str] [kotws.links :as klinks])
+   :task
+   (do
+     (println "Testing:")
+     (let [r (->> klinks/all-links
+                  (pmap (fn [{:keys [absolute-url name]
+                              :as tested-url}]
+                          (let [s (pr-str name)]
+                            (try (let [content (http/get absolute-url)
+                                       valid? (contains? #{301 200} (:status content))]
+                                   (if valid?
+                                     (print (str s ", "))
+                                     (print (str "\u001b[41m"
+                                                 s
+                                                 "\u001b[0m"
+                                                 ", found= "
+                                                 (subs (:status content) 1 10))))
+                                   (merge tested-url (dissoc content :uri) {:valid? valid?}))
+                                 (catch Exception e
+                                   (println (str "\u001b[41m" s "\u001b[0m") " -> exception")
+                                   (assoc tested-url :exception e :url absolute-url))))))
+                  vec)]
+       (println)
+       (println "********************************************************************************")
+       (println "As a synthesis, failed to load :")
+       (doseq [link r]
+         (when-not (:valid? link)
+           (println "* " (:absolute-url link) ", found " (:status link) (keys link))))
+       (if (nil? (System/getenv "SASU_CAUMOND_PROD_REPO"))
+         (println
+          "Setup this environment variable SASU_CAUMOND_PROD_REPO to be able to push to production")
+         (println "Ready to push to production"))))}
+  env-dev {:depends [clean]
+           :doc "Prepare dev environment (both repls and css)."
+           :task (run '-env-dev {:parallel true})}
+  env-prod {:depends [clean]
+            :doc "TODO Compile frontend and backend in production mode and start it"
+            :task (do (shell "npx shadow-cljs release app") (shell "clj -X:prod"))}
+  format {:doc "Format"
+          :requires [[auto-build.tasks.formatting :as task-format]
+                     [auto-build.echo :refer [level1-header]]]
+          :task (-> (task-format/format level1-header "." (current-task))
+                    exit)}
+  heph-info {:doc "Hephaistox project info"
+             :extra-paths ["env/dev/resources"]
+             :requires [[auto-build.tasks.heph-info :as heph-info]
+                        [auto-build.echo :refer [level1-header]]]
+             :task (-> (heph-info/heph-info level1-header (current-task))
+                       exit)}
+  lint {:doc "Lint"
+        :requires [[auto-build.tasks.lint :as task-lint] [auto-build.echo :refer [level1-header]]]
+        :task (-> (task-lint/lint level1-header ["src" "test"] "." (current-task))
+                  exit)}
+  repl {:doc "Clojure repl"
+        :override-builtin true
+        :requires [[auto-build.tasks.repl :as build-repl] [auto-build.echo :refer [level1-header]]]
+        :task (-> (build-repl/repl level1-header "." (current-task))
+                  exit)}
+  uberjar {:doc "Uberjar"
+           :override-builtin true
+           :requires [[auto-build.tasks.frontend :as build-frontend]
+                      [auto-build.echo :refer [level1-header]]]
+           :task (-> (build-frontend/uberjar level1-header
+                                             "."
+                                             (:target-dir pars)
+                                             (:cljs-app pars)
+                                             (:deployment-url pars))
+                     exit)}}}

@@ -1,10 +1,11 @@
 (ns kotws.components.v-selector)
 
-(defn- clamp
+(defn clamp
   [v min max]
-  (cond (< v min) min
-        (> v max) max
-        :else v))
+  (cond
+    (< v min) min
+    (> v max) max
+    :else v))
 
 (defn relative-jump
   "Current element `v` is move to `val` page forward (if positive, backward if negative).
@@ -28,14 +29,15 @@
                              ^{:key page}
                              [:span.w3-button.w3-small
                               (cond-> (when (= (dec page) selected)
-                                        {:class "w3-disabled",
+                                        {:class "w3-disabled"
                                          :style {:cursor :default}})
-                                (fn? go-to) (merge (go-to (dec page)))) page]))
-               [:div
-                [:i.w3-button.fa.fa-angle-left
-                 (cond-> {}
-                   (fn? go-rel) (merge (go-rel -1))
-                   (zero? selected) (assoc :class "w3-disabled"))]]))
+                                (fn? go-to) (merge (go-to (dec page))))
+                              page]))
+                     [:div
+                      [:i.w3-button.fa.fa-angle-left
+                       (cond-> {}
+                         (fn? go-rel) (merge (go-rel -1))
+                         (zero? selected) (assoc :class "w3-disabled"))]]))
         [:i.w3-button.fa.fa-angle-right
          (cond-> {}
            (fn? go-rel) (merge (go-rel 1))

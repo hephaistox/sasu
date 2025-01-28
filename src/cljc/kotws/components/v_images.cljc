@@ -1,7 +1,8 @@
 (ns kotws.components.v-images
   "Show image cells than are mobile compliant."
-  (:require [kotws.components.items :as kcitems]
-            [kotws.components.v-labelled-image :as vclabelled-image]))
+  (:require
+   [kotws.components.items            :as kcitems]
+   [kotws.components.v-labelled-image :as vclabelled-image]))
 
 (defn defaulting
   "Add default values for all items.
@@ -25,7 +26,6 @@
   (reduce (fn [hiccup {:keys [img-link name href]}]
             (conj hiccup
                   [:div.w3-cell.w3-mobile
-                   [vclabelled-image/labelled-image img-link href (tr name)
-                    w]]))
-    [:div.w3-cell-row]
-    (vals items)))
+                   [vclabelled-image/labelled-image img-link href (tr name) w]]))
+          [:div.w3-cell-row]
+          (vals items)))

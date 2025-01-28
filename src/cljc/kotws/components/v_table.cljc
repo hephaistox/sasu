@@ -1,6 +1,7 @@
 (ns kotws.components.v-table
   "Display elements of the table"
-  (:require [kotws.components.items :as kcitems]))
+  (:require
+   [kotws.components.items :as kcitems]))
 
 (defn defaulting
   [items tr langs]
@@ -18,6 +19,5 @@
    (->> items
         (reduce (fn [hiccup-item [_ {:keys [label cells]}]]
                   (conj hiccup-item
-                        [:tr [:td (when label [:p.text label])]
-                         [:td [:p.text (first cells)]]]))
-          [:tbody]))])
+                        [:tr [:td (when label [:p.text label])] [:td [:p.text (first cells)]]]))
+                [:tbody]))])

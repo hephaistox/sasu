@@ -1,11 +1,12 @@
-(ns kotws.sub-map
-  "Helpers for maps of maps (the inner map is called `sub-map`)")
+(ns kotws.sub-map "Helpers for maps of maps (the inner map is called `sub-map`)")
 
 (defn add-key
   "Each key of the `map-of-map` is added to inner maps under the `kw` keyword, if it was not existing already.."
   [map-of-map kw]
   (->> map-of-map
-       (mapv (fn [[k v]] [k (cond-> v (nil? (get v kw)) (assoc kw k))]))
+       (mapv (fn [[k v]] [k
+                          (cond-> v
+                            (nil? (get v kw)) (assoc kw k))]))
        (into {})))
 
 (defn array-map-add-key
@@ -14,7 +15,9 @@
   This version creates an array-map to preserve the order of the elements."
   [map-of-map kw]
   (->> map-of-map
-       (mapv (fn [[k v]] [k (cond-> v (nil? (get v kw)) (assoc kw k))]))
+       (mapv (fn [[k v]] [k
+                          (cond-> v
+                            (nil? (get v kw)) (assoc kw k))]))
        flatten
        (apply array-map)))
 
@@ -24,8 +27,7 @@
   (-> map-of-map
       (update-vals (fn [submap]
                      (cond-> submap
-                       (nil? (get submap kw))
-                         (assoc kw (apply kw-val-fn submap args)))))))
+                       (nil? (get submap kw)) (assoc kw (apply kw-val-fn submap args)))))))
 
 (defn reference-kw-suffix
   "Update submaps keyword `kw` with the value of `kw-ref` completed `suffix`.
@@ -36,18 +38,18 @@
                         kw
                         kw-ref
                         (apply str
-                          (some-> kw
-                                  name
-                                  (cons ["-"])
-                                  reverse))))
+                               (some-> kw
+                                       name
+                                       (cons ["-"])
+                                       reverse))))
   ([map-of-map kw kw-ref suffix]
    (let [kw (if (vector? (vector? kw)) kw [kw])]
      (-> map-of-map
          (update-vals (fn [submap]
                         (cond-> submap
                           (nil? (get-in submap kw)) (assoc-in kw
-                                                      (some-> submap
-                                                              (get kw-ref)
-                                                              name
-                                                              (str suffix)
-                                                              keyword)))))))))
+                                                     (some-> submap
+                                                             (get kw-ref)
+                                                             name
+                                                             (str suffix)
+                                                             keyword)))))))))

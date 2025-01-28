@@ -1,18 +1,17 @@
 (ns kotws.components.c-selector
   "A stateful selector displaying numbered elements, wrapped in previous and next buttons."
-  (:require [re-frame.core :as rf]
-            [kotws.components.v-selector :as kvselector]))
+  (:require
+   [kotws.components.v-selector :as kvselector]
+   [re-frame.core               :as rf]))
 
 (rf/reg-sub ::selected-idx (fn [db _] (:selected-idx db)))
 
 (rf/reg-event-db
-  ::change-selected-idx
-  (fn [db [_ sel-kw change-mode val n]]
-    (case change-mode
-      :abs (assoc-in db [:selected-idx sel-kw] (kvselector/clamp val 0 n))
-      :rel (update-in db
-                      [:selected-idx sel-kw]
-                      (partial kvselector/relative-jump n val)))))
+ ::change-selected-idx
+ (fn [db [_ sel-kw change-mode val n]]
+   (case change-mode
+     :abs (assoc-in db [:selected-idx sel-kw] (kvselector/clamp val 0 n))
+     :rel (update-in db [:selected-idx sel-kw] (partial kvselector/relative-jump n val)))))
 
 (defn selected
   "Returns the selected element for selector called `sel-kw`"
